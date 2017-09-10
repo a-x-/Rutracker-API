@@ -163,7 +163,8 @@ RutrackerApi.prototype.parseSearch = function(rawHtml, callback) {
       category : category.find('.f-name a').html(),
       title    : title.find('div a ').html(),
       author   : author.find('div a ').html(),
-      size     : formatSize( size.find('*').html() ),
+      size_h   : formatSize( size.find('*').html() ),
+      size_b   : size.find('*').html(),
       seeds    : seeds.find('b').html(),
       leechs   : leechs.find('b').html(),
       url      : 'http://' + this.host + '/forum/' + title.find('div a').attr('href')
