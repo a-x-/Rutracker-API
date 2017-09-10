@@ -4,6 +4,7 @@ var http = require('http'),
   cheerio = require('cheerio'),
   windows1251 = require('windows-1251'),
   sessionPath = '/tmp/Rutracker-API.json',
+  session,
   EventEmitter = require('events');
 
 function RutrackerApi(data) {
@@ -45,7 +46,7 @@ RutrackerApi.prototype.login = function(username, password) {
   
   do {
     if (fs.exists(sessionPath)) {
-      if (var session = JSON.parse(fs.readFileSync(sessionPath))) {
+      if (session = JSON.parse(fs.readFileSync(sessionPath))) {
         if (Date.now() - session.ts < 1000 * 60 * 60 * 12) { // less then 12 hours old
           this.cookie = session.cooke;
           this.emit('login');
