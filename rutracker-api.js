@@ -1,7 +1,9 @@
 var http = require('http'),
   querystring = require('querystring'),
+  fs = require('fs'),
   cheerio = require('cheerio'),
   windows1251 = require('windows-1251'),
+  sessionPath = '/tmp/Rutracker-API.json',
   EventEmitter = require('events');
 
 function RutrackerApi(data) {
@@ -40,18 +42,30 @@ RutrackerApi.prototype.login = function(username, password) {
       'Content-Length': postData.length
     }
   };
-
-  var that = this;
-  var req = http.request(options, function(res) {
-    if (res.statusCode == '302') {
-      that.cookie = res.headers['set-cookie'][0];
-      that.emit('login');
-    } else {
-      that.emit('login-error');
+  
+  do {
+    if (fs.exists(sessionPath)) {
+      if (var session = JSON.parse(fs.readFileSync(sessionPath))) {
+        if (Date.now() - session.ts < 1000 * 60 * 60 * 12) { // less then 12 hours old
+          this.cookie = session.cooke;
+          this.emit('login');
+          break;
+        }
+      }
     }
-  });
 
-  req.on('error', function(err) { that.emit('error', err); });
+    var req = http.request(options, function(res) {
+      if (res.statusCode == '302') {
+        this.cookie = res.headers['set-cookie'][0];
+        fs.writeFile(sessionPath, JSON.stringify({ cookie: this.cookie, ts: Date.now() }), ()=>{});
+        this.emit('login');
+      } else {
+        this.emit('login-error');
+      }
+    }.bind(this));
+  } while (false);
+
+  req.on('error', function(err) { this.emit('error', err); }.bind(this));
   req.write(postData);
   req.end();
 };
