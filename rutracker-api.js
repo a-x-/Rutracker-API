@@ -8,7 +8,7 @@ var http = require('http'),
   EventEmitter = require('events');
 
 function RutrackerApi(data) {
-  this.host = 'rutracker.net';
+  this.host = 'rutracker.cr';
   this.login_path = '/forum/login.php';
   this.search_path = '/forum/tracker.php';
   this.download_path = '/forum/dl.php';
