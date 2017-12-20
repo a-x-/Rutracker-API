@@ -57,7 +57,8 @@ RutrackerApi.prototype.login = function(username, password) {
 
     var req = http.request(options, function(res) {
       if (res.statusCode == '302') {
-        this.cookie = res.headers['set-cookie'][0];
+        this.cookie = (res.headers['set-cookie'] instanceof Array) && res.headers['set-cookie'][0];
+        if (!this.cookie) throw new Error('auth_error');
         fs.writeFile(sessionPath, JSON.stringify({ cookie: this.cookie, ts: Date.now() }), ()=>{});
         this.emit('login');
       } else {
